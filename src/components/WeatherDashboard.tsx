@@ -63,7 +63,7 @@ const WeatherDashboard: React.FC = () => {
         <CustomSnackbar open={!!message} message={message} severity={severity} onClose={handleCloseSnackbar} />
       )}
       {cities.length === 0 && <p className="mt-4 text-gray-500">No cities added. Please search for a city to add.</p>}
-      <div className="flex flex-col items-center w-full">
+      <div className="grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-4 w-full">
         {sortedCities.map((city) => (
           <CityCard
             key={city.name}
