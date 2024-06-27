@@ -43,7 +43,7 @@ const CityCard: React.FC<CityCardProps> = ({ city, onRemove, onPin, onUnpin, onE
 
   if (isLoading) {
     return (
-      <Card variant="outlined" className="flex justify-center items-center min-h-72 w-full my-2">
+      <Card variant="outlined" className="flex items-center justify-center w-full my-2 min-h-72">
         <CardContent>
           <CircularProgress />
         </CardContent>
@@ -58,8 +58,8 @@ const CityCard: React.FC<CityCardProps> = ({ city, onRemove, onPin, onUnpin, onE
   const weatherData: WeatherApiResponse = data;
 
   return (
-    <Card variant="outlined" className="w-full mb-4">
-      <CardContent>
+    <Card variant="outlined" className="flex flex-col justify-between w-full h-full mb-4">
+      <CardContent className="flex-grow">
         <div className="flex items-center justify-between mb-4">
           <Typography variant="h5">{weatherData.location.name}</Typography>
           <div className="flex gap-2">
