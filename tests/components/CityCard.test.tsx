@@ -39,7 +39,6 @@ test('renders CityCard component with weather data', () => {
       onPin={jest.fn()}
       onUnpin={jest.fn()}
       onError={jest.fn()}
-      onSuccess={jest.fn()}
       setCities={jest.fn()}
       cities={[]}
     />
@@ -61,7 +60,6 @@ test('calls onRemove when the remove button is clicked', () => {
       onPin={jest.fn()}
       onUnpin={jest.fn()}
       onError={jest.fn()}
-      onSuccess={jest.fn()}
       setCities={jest.fn()}
       cities={[]}
     />

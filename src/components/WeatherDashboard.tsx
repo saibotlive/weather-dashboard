@@ -1,9 +1,10 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { Box } from '@mui/material';
 import SearchBar from './SearchBar';
 import CityCard from './CityCard';
 import CustomSnackbar from './CustomSnackbar';
 import useLocalStorage from '../hooks/useLocalStorage';
+import { normalizeCityName } from '../utils';
 
 interface City {
   name: string;
@@ -14,13 +15,15 @@ const WeatherDashboard: React.FC = () => {
   const [cities, setCities] = useLocalStorage<City[]>('cities', []);
   const [message, setMessage] = useState<string | null>(null);
   const [severity, setSeverity] = useState<'success' | 'error'>('success');
-
-  const normalizeCityName = useMemo(() => (city: string) => city.trim().toLowerCase(), []);
+  const newCityRef = useRef<HTMLDivElement | null>(null);
 
   const handleSearch = (city: string) => {
     const normalizedCity = normalizeCityName(city);
     if (!cities.some((c) => normalizeCityName(c.name) === normalizedCity)) {
       setCities([...cities, { name: city, pinned: false }]);
+      setTimeout(() => {
+        newCityRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
     } else {
       setMessage('City already exists in the list.');
       setSeverity('error');
@@ -64,24 +67,21 @@ const WeatherDashboard: React.FC = () => {
       )}
       {cities.length === 0 && <p className="mt-4 text-gray-500">No cities added. Please search for a city to add.</p>}
       <div className="grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-4 w-full">
-        {sortedCities.map((city) => (
-          <CityCard
-            key={city.name}
-            city={city}
-            onRemove={() => handleRemoveCity(city.name)}
-            onPin={() => handlePinCity(city.name)}
-            onUnpin={() => handleUnpinCity(city.name)}
-            onError={(message) => {
-              setMessage(message);
-              setSeverity('error');
-            }}
-            onSuccess={(message) => {
-              setMessage(message);
-              setSeverity('success');
-            }}
-            setCities={setCities}
-            cities={cities}
-          />
+        {sortedCities.map((city, index) => (
+          <div key={city.name} ref={index === cities.length - 1 ? newCityRef : null}>
+            <CityCard
+              city={city}
+              onRemove={() => handleRemoveCity(city.name)}
+              onPin={() => handlePinCity(city.name)}
+              onUnpin={() => handleUnpinCity(city.name)}
+              onError={(message) => {
+                setMessage(message);
+                setSeverity('error');
+              }}
+              setCities={setCities}
+              cities={cities}
+            />
+          </div>
         ))}
       </div>
     </Box>

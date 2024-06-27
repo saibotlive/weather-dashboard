@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { Card, CardContent, Typography, Button, Grid, CircularProgress } from '@mui/material';
 import useWeatherData from '../hooks/useWeatherData';
 import { WeatherApiResponse } from '../services/weatherApi';
+import { normalizeCityName } from '../utils';
 
 interface City {
   name: string;
@@ -14,42 +15,31 @@ interface CityCardProps {
   onPin: () => void;
   onUnpin: () => void;
   onError: (message: string) => void;
-  onSuccess: (message: string) => void;
   setCities: (cities: City[]) => void;
   cities: City[];
 }
 
-const CityCard: React.FC<CityCardProps> = ({
-  city,
-  onRemove,
-  onPin,
-  onUnpin,
-  onError,
-  onSuccess,
-  setCities,
-  cities,
-}) => {
+const CityCard: React.FC<CityCardProps> = ({ city, onRemove, onPin, onUnpin, onError, setCities, cities }) => {
   const { data, error, isLoading } = useWeatherData(city.name);
-
-  const normalizeCityName = (city: string) => city.trim().toLowerCase();
 
   useEffect(() => {
     if (error) {
       onError((error as Error).message);
       setCities(cities.filter((c) => normalizeCityName(c.name) !== normalizeCityName(city.name)));
     } else if (data) {
-      const correctCityName = data.location.name.trim().toLowerCase();
+      const correctCityName = normalizeCityName(data.location.name);
+
       if (cities.some((c) => normalizeCityName(c.name) === correctCityName && c.name !== city.name)) {
         setCities(cities.filter((c) => normalizeCityName(c.name) !== normalizeCityName(city.name)));
+        onError(`${data.location.name} already exists in the list.`);
       } else if (!cities.some((c) => normalizeCityName(c.name) === correctCityName)) {
         setCities([
           ...cities.filter((c) => normalizeCityName(c.name) !== normalizeCityName(city.name)),
           { ...city, name: correctCityName },
         ]);
-        onSuccess(`${data.location.name} has been added successfully.`);
       }
     }
-  }, [data, error, onError, onSuccess, setCities, cities, city]);
+  }, [data, error, onError, setCities, cities, city]);
 
   if (isLoading) {
     return (
